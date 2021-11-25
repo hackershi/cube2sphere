@@ -55,6 +55,8 @@ if __name__ == '__main__':
 
 
         files = list((img_dir/main_folder).iterdir())
+        if end_index == -1 or end_index > len(files):
+            end_index = len(files)
         file_names = [x.name for x in files][start_index:end_index]
 
         out_dir_idx = 0
