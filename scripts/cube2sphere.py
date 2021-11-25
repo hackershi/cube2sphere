@@ -8,7 +8,7 @@ config_data = json.load(open(cwd/"config.json", 'r'))
 width = config_data['width']
 height = config_data['height']
 img_dirs = config_data['image_dirs']
-
+thread_num = config_data['thread_num']
 
 
 
@@ -65,7 +65,7 @@ for img_dir in img_dirs:
                 raise Exception(f"{name} not exist")
 
         out_name = rf'{out_dir}\{file_name}'
-        cmd_string = rf'cube2sphere {back_name}  {main_name} {right_name} {left_name}  {top_name} {down_name} -r 4096 2048 -fPNG -o  {out_name} -t 20 -R 0 0 180 '
+        cmd_string = rf'cube2sphere {back_name}  {main_name} {right_name} {left_name}  {top_name} {down_name} -r {width} {height} -fPNG -o  {out_name} -t {thread_num} -R 0 0 180 '
         cmd = cmd_string.split()
         subprocess.run(cmd)
         os.rename(f'{out_name}0001.png', f'{out_name}')

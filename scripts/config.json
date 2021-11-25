@@ -1,7 +1,7 @@
 {
     "width":4096,
     "height":2048,
-    "thread_num":10,
+    "thread_num":20,
     "image_dirs":[
         "D:\\laoshi\\tmp\\img_dir"
     ]
