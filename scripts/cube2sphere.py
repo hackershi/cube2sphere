@@ -1,38 +1,75 @@
-import os
+#coding=utf-8
+import os,json,subprocess, time, shutil
 from pathlib import Path
-import subprocess, time
+
+cwd =  Path(__file__).parents[0]
+config_data = json.load(open(cwd/"config.json", 'r'))
+
+width = config_data['width']
+height = config_data['height']
+img_dirs = config_data['image_dirs']
 
 
-# Opens the Video file
-file_dir = Path(r"E:\1117\2021-11-17_17-03-42\back_cam_v03")
-files = list(file_dir.iterdir())
-file_names = [x.name for x in files]
 
-folder_path = r"E:\1117\2021-11-17_17-03-42"
-folder_name = ['back_cam_v03',
- 'down_cam_v03',
- 'left_cam_v03',
- 'main_cam_v03',
- 'right_cam_v03',
- 'top_cam_v03',
- ]
 
-outdir = r"synthesis"
+for img_dir in img_dirs:
+    main_folder = ""
+    back_folder = ""
+    left_folder = ""
+    right_folder = ""
+    top_folder = ""
+    down_folder = ""
 
-start_time = time.time()
-for idx,file_name in enumerate(file_names):
-    back_name = rf'{folder_path}\{folder_name[0]}\{file_name}'
-    down_name = rf'{folder_path}\{folder_name[1]}\{file_name}'
-    left_name = rf'{folder_path}\{folder_name[2]}\{file_name}'
-    main_name = rf'{folder_path}\{folder_name[3]}\{file_name}'
-    right_name = rf'{folder_path}\{folder_name[4]}\{file_name}'
-    top_name = rf'{folder_path}\{folder_name[5]}\{file_name}'
-    out_name = rf'{folder_path}\{outdir}\{file_name}'
-    cmd_string = rf'cube2sphere {back_name}  {main_name} {right_name} {left_name}  {top_name} {down_name} -r 4096 2048 -fPNG -o  {out_name} -t 20 -R 0 0 180 '
-    cmd = cmd_string.split()
-    subprocess.run(cmd)
-    os.rename(f'{out_name}0001.png', f'{out_name}')
-    print(idx, end = (',' if idx%5!=4 else "\n"))
+    img_dir = Path(img_dir)
+    folders = list(img_dir.iterdir())
 
-total_time = time.time() - start_time
-print(f"total time {total_time} seconds")
+    for folder in folders:
+        if "main" in str(folder):
+            main_folder = folder
+        if "back" in str(folder):
+            back_folder = folder
+        if 'top' in str(folder):
+            top_folder = folder
+        if "down" in str(folder):
+            down_folder = folder
+        if "left" in str(folder):
+            left_folder = folder
+        if "right" in str(folder):
+            right_folder = folder
+
+    if main_folder == "" or back_folder == "" or left_folder == "" or right_folder == "" or top_folder == "" or down_folder == "":
+        print(f"folder {img_dir} folder not complete:[main, back, left, right, top, down]")
+        continue
+
+
+    files = list((img_dir/main_folder).iterdir())
+    file_names = [x.name for x in files]
+
+
+    out_dir = rf'{img_dir}\out'
+    if os.path.exists(out_dir):
+        shutil.rmtree(out_dir)
+
+    start_time = time.time()
+    for idx,file_name in enumerate(file_names):
+        back_name = rf'{back_folder}\{file_name}'
+        down_name = rf'{down_folder}\{file_name}'
+        left_name = rf'{left_folder}\{file_name}'
+        main_name = rf'{main_folder}\{file_name}'
+        right_name = rf'{right_folder}\{file_name}'
+        top_name = rf'{top_folder}\{file_name}'
+        
+        names = [back_name, main_name, top_name, down_name, left_name, right_name]
+        for name in names:
+            if not os.path.exists(name):
+                raise Exception(f"{name} not exist")
+
+        out_name = rf'{out_dir}\{file_name}'
+        cmd_string = rf'cube2sphere {back_name}  {main_name} {right_name} {left_name}  {top_name} {down_name} -r 4096 2048 -fPNG -o  {out_name} -t 20 -R 0 0 180 '
+        cmd = cmd_string.split()
+        subprocess.run(cmd)
+        os.rename(f'{out_name}0001.png', f'{out_name}')
+        print(idx, end = (',' if idx%10!=9 else "\n"))
+
+    total_time = time.time() - start_time
+    print(f"time {total_time:0.2f} seconds")
