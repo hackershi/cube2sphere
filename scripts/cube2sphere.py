@@ -57,7 +57,9 @@ if __name__ == '__main__':
         files = list((img_dir/main_folder).iterdir())
         if end_index == -1 or end_index > len(files):
             end_index = len(files)
-        file_names = [x.name for x in files][start_index:end_index]
+        file_names = [x.name for x in files]
+        file_names.sort()        
+        file_names = file_names[start_index:end_index]
 
         out_dir_idx = 0
         out_dir = rf'{img_dir}\out_{out_dir_idx:03d}'
