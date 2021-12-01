@@ -19,8 +19,11 @@ def process_task(back_name, main_name, right_name, left_name, top_name, down_nam
     global width, height
     cmd_string = rf'cube2sphere {back_name}  {main_name} {right_name} {left_name}  {top_name} {down_name} -r {width} {height} -fPNG -o  {out_name} -t 5 -R 0 0 180 '
     cmd = cmd_string.split()
-    subprocess.run(cmd)
-    os.rename(f'{out_name}0001.png', f'{out_name}')
+    try:
+        subprocess.run(cmd)
+        os.rename(f'{out_name}0001.png', f'{out_name}')
+    except:
+        print(f"{back_name} failed")
 
 
 if __name__ == '__main__':
@@ -80,10 +83,15 @@ if __name__ == '__main__':
                 out_name = rf'{out_dir}\{file_name}'
 
                 names = [back_name, main_name, top_name, down_name, left_name, right_name]
+                ok = True
                 for name in names:
                     if not os.path.exists(name):
-                        raise Exception(f"{name} not exist")
-                
+                        print(f"{name} not exist")
+                        ok = False
+
+                if not ok:
+                    continue
+
                 futures.append(executor.submit(process_task,back_name, main_name, right_name, left_name, top_name, down_name, out_name))
             
             cnt = 0
